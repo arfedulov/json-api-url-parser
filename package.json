@@ -1,0 +1,21 @@
+{
+  "name": "ts-node-starter",
+  "version": "0.1.0",
+  "main": "src/index.ts",
+  "author": "Artem Fedulov <arfedulov@gmail.com>",
+  "license": "n/a",
+  "private": true,
+  "dependencies": {
+     "@types/jest": "^24.0.20",
+     "@types/node": "^12.11.2",
+     "jest": "^24.9.0",
+     "ts-jest": "^24.1.0",
+     "ts-node": "^8.4.1",
+     "tslint": "^5.20.0",
+     "typescript": "^3.6.4"
+  },
+  "scripts": {
+     "test": "jest",
+     "check": "tsc --noEmit"
+  }
+}
