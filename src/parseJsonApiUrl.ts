@@ -14,8 +14,8 @@ export interface JsonApiUrlParams {
 export interface Filter {
   /** Field name to apply filtering to. */
   fieldName: string;
-  /** Predicate that returns true if the value pass the filter. */
-  predicate: (fieldValue: any) => boolean;
+  /** A predicate expressed in textual form ( this module is unaware of semantics ). */
+  predicateString: string;
 }
 
 export interface Sort {
@@ -41,6 +41,77 @@ const groupIndexes = {
   relationshipType: 5,
 };
 
+interface PaginationParams {
+  pageSize?: number;
+  pageNumber?: number;
+}
+
+interface QueryObject {
+  [key: string]: string;
+}
+
+const parsePaginationQueries = (query: QueryObject): PaginationParams => {
+  const result: PaginationParams = {};
+  Object.keys(query).forEach((key) => {
+    if (!key.startsWith('page[')) {
+      return;
+    }
+    switch (key) {
+      case 'page[size]': {
+        result.pageSize = +query[key];
+        break;
+      }
+      case 'page[number]': {
+        result.pageNumber = +query[key];
+        break;
+      }
+      default:
+        break;
+    }
+  });
+
+  return result;
+};
+
+const parseFilteringQueries = (query: QueryObject): Filter[] | undefined => {
+  const result: Filter[] = [];
+  Object.keys(query).forEach((key) => {
+    if (!key.startsWith('filter[')) {
+      return;
+    }
+    const start = key.indexOf('[');
+    const end = key.indexOf(']');
+    if (start !== -1 && end !== -1 && end - start > 1) {
+      result.push({
+        fieldName: key.slice(start + 1, end),
+        predicateString: query[key],
+      });
+    }
+  });
+
+  return result.length > 0 ? result : undefined;
+};
+
+const parseSortingQueries = (query: QueryObject): Sort[] | undefined => {
+  const result: Sort[] = [];
+  const fields = query.sort && query.sort.split(',');
+  if (fields) {
+    fields.forEach((field) => {
+      const sortElement: Sort = {
+        fieldName: field,
+        order: '+',
+      };
+      if (field.startsWith('-')) {
+        sortElement.fieldName = field.slice(1);
+        sortElement.order = '-';
+      }
+      result.push(sortElement);
+    });
+  }
+
+  return result.length > 0 ? result : undefined;
+};
+
 export const parseJsonApiUrl = (url: string): JsonApiUrlParams => {
   const { pathname, query } = parseUrl(url);
 
@@ -53,11 +124,12 @@ export const parseJsonApiUrl = (url: string): JsonApiUrlParams => {
     throw new Error(`Url ${ url } is not json:api url.`);
   }
 
-  const result = {} as JsonApiUrlParams;
-
-  result.resourceType = match[groupIndexes.resourceType];
-  result.resourceId = match[groupIndexes.resourceId];
-  result.relationshipType = match[groupIndexes.relationshipType];
-
-  return result;
+  return {
+    resourceType: match[groupIndexes.resourceType],
+    resourceId: match[groupIndexes.resourceId],
+    relationshipType: match[groupIndexes.relationshipType],
+    filters: parseFilteringQueries(query),
+    sort: parseSortingQueries(query),
+    ...parsePaginationQueries(query),
+  };
 };
