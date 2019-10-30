@@ -1,25 +1,39 @@
 {
-   "name": "ts-node-starter",
+   "name": "@arfedulov/json-api-url-parser",
    "version": "0.1.0",
-   "main": "src/index.ts",
+   "main": "dist/index.ts",
    "author": "Artem Fedulov <arfedulov@gmail.com>",
    "license": "MIT",
-   "private": true,
+   "private": false,
+   "repository": {
+    "type" : "git",
+    "url": "https://github.com/arfedulov/json-api-url-parser.git"
+  },
+  "bugs": {
+    "url" : "https://github.com/arfedulov/json-api-url-parser/issues",
+    "email" : "arfedulov@gmail.com"
+  },
    "dependencies": {
+      "query-string": "^6.8.3",
+      "url-parse": "^1.4.7"
+   },
+   "devDependencies": {
       "@types/jest": "^24.0.20",
       "@types/lodash": "^4.14.144",
       "@types/node": "^12.11.2",
       "jest": "^24.9.0",
       "lodash": "^4.17.15",
-      "query-string": "^6.8.3",
       "ts-jest": "^24.1.0",
       "ts-node": "^8.4.1",
       "tslint": "^5.20.0",
-      "typescript": "^3.6.4",
-      "url-parse": "^1.4.7"
+      "typescript": "^3.6.4"
    },
    "scripts": {
       "test": "jest",
-      "check": "tsc --noEmit"
+      "check": "npx tsc --noEmit",
+      "prebuild": "rm -rf dist && yarn test",
+      "build": "npx tsc && yarn run removeBuildTests",
+      "removeBuildTests": "rm -rf dist/__tests__ dist/**/__tests__",
+      "prepublish": "yarn build"
    }
 }

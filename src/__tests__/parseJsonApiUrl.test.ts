@@ -1,7 +1,7 @@
 import assert from 'assert';
 import { pick, some } from 'lodash';
 
-import { parseJsonApiUrl } from '../parseJsonApiUrl';
+import { parseJsonApiUrl } from '..';
 
 test('parseJsonApiUrl(): parse url params', () => {
   const INPUT = 'https://abc.com/articles/12345/relationships/author';
