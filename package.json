@@ -1,7 +1,7 @@
 {
    "name": "@arfedulov/json-api-url-parser",
-   "version": "0.1.0",
-   "main": "dist/index.ts",
+   "version": "0.1.1",
+   "main": "dist/index.js",
    "author": "Artem Fedulov <arfedulov@gmail.com>",
    "license": "MIT",
    "private": false,
@@ -32,8 +32,7 @@
       "test": "jest",
       "check": "npx tsc --noEmit",
       "prebuild": "rm -rf dist && yarn test",
-      "build": "npx tsc && yarn run removeBuildTests",
-      "removeBuildTests": "rm -rf dist/__tests__ dist/**/__tests__",
+      "build": "npx tsc -p tsconfig.build.json --declaration",
       "prepublish": "yarn build"
    }
 }
